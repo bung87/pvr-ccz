@@ -23,5 +23,9 @@ Please file feature requests and bugs at the [issue tracker][tracker].
 
 ## References
 
+pvrt:  
 [cruiseliu/jn-decoder](https://github.com/cruiseliu/jn-decoder)  
+[pvrt-header](https://github.com/nickworonekin/puyotools/wiki/PVR-Texture#pvrt-header)  
+pvr:  
 [cocos-creator/cocos2d-x-lite](https://github.com/cocos-creator/cocos2d-x-lite/)  
+[PVR File Format Specification](http://cdn.imgtec.com/sdk-documentation/PVR+File+Format.Specification.pdf)
