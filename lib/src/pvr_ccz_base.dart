@@ -1,9 +1,19 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:path/path.dart' as p;
-import './pvr.dart';
-import './logger.dart';
-import 'package:image/image.dart' as image; 
+import 'package:image/image.dart';
+
+class UnsupportedCCZHeader implements Exception {
+  final String message = 'Unsupported CCZ header format';
+}
+
+class UnsupportedCCZCompression implements Exception {
+  final String message = 'Unsupported CCZ compression method';
+}
+
+class InvalidCCZFile implements Exception {
+  final String message = 'Invalid CCZ file';
+}
 
 class _CompressType {
   static const zlib = 0;
@@ -11,7 +21,7 @@ class _CompressType {
   static const gzip = 2;
 }
 
-class _Header { 
+class _Header {
   String sig; // Signature. Should be 'CCZ!' 4 bytes.
   int compression_type; // unsigned short 2 bytes, Should be 0.
   int version; // unsigned short 2 bytes, Should be 2 (although version type==1 is also supported)
@@ -46,45 +56,38 @@ class _Header {
   }
 }
 
-class Ccz {
-  Pvr _pvr;
-  Ccz(Uint8List data) {}
-  bool valid() => _pvr != null && _pvr.valid();
-}
-
-int inflateCCZBuffer(ByteBuffer buffer) {
+List<int> inflateCCZBuffer(ByteBuffer buffer) {
   var header = _Header.fromBuffer(buffer);
-  log.info(header);
   if (header.sig == 'CCZ!') {
     if (header.version > 2) {
-      log.severe('Unsupported CCZ header format');
-      return -1;
+      throw UnsupportedCCZHeader();
     }
     if (header.compression_type != _CompressType.zlib) {
-      log.severe('CCZ Unsupported compression method');
-      return -1;
+      throw UnsupportedCCZCompression();
     }
   } else if (header.sig == 'CCZp') {
     // TODO decript encoded pvr
     throw UnimplementedError();
   } else {
-    log.severe('Invalid CCZ file');
-    return -1;
+    throw InvalidCCZFile();
   }
-  // pvr
-  var pvr_data =  zlib.decode(Uint8List.view(buffer, _Header.size ));
-  var img = image.PvrtcDecoder().decodePvr(pvr_data);
-  return 0;
+
+  var pvr_data = zlib.decode(Uint8List.view(buffer, _Header.size));
+  return pvr_data;
 }
 
-int inflateCCZFile(filename) {
+List<int> inflateCCZFile(String filename) {
   var file = File(filename);
   var bytes = file.readAsBytesSync();
   return inflateCCZBuffer(bytes.buffer);
 }
 
+Image decodeCCB(String filename){
+  var pvr_data = inflateCCZFile(filename);
+  return PvrtcDecoder().decodePvr(pvr_data);
+}
+
 void main() {
-  log.onRecord.listen(print);
   inflateCCZFile(Platform.script
       .resolve(p.join('..', '..', 'test', 'SmlMap0.pvr.ccz'))
       .toFilePath());
