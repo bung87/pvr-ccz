@@ -1,7 +1,15 @@
 A library for Dart developers.
 
-decode `pvr.ccz` to `Image`.
+decode `pvr.ccz` to `Image`.  
 
+`pubspec.yaml`  
+
+```
+dependencies:
+  pvr_ccz:
+    git:
+      url: git://github.com/bung87/pvr-ccz.git
+```
 ## Usage
 
 A simple usage example:
