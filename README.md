@@ -19,7 +19,7 @@ import 'package:pvr_ccz/pvr_ccz.dart';
 
 main() {
   var filename = "your.pvr.ccz";
-  var image = decodeCCB(filename);
+  var image = decodeCCZ(filename);
 }
 ```
 
