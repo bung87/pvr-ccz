@@ -81,7 +81,7 @@ List<int> inflateCCZFile(String filename) {
   return inflateCCZBuffer(bytes.buffer);
 }
 
-Image decodeCCZ(String filename){
+Image decodePvrCcz(String filename){
   var pvr_data = inflateCCZFile(filename);
   return PvrtcDecoder().decodePvr(pvr_data);
 }
