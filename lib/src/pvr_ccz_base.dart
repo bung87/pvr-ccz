@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:path/path.dart' as p;
 import './pvr.dart';
 import './logger.dart';
+import 'package:image/image.dart' as image; 
 
 class _CompressType {
   static const zlib = 0;
@@ -71,10 +72,8 @@ int inflateCCZBuffer(ByteBuffer buffer) {
     return -1;
   }
   // pvr
-  // var  pvr_data = ZLibDecoder(raw:true).convert(Uint8List.view(buffer, 12));
-  var pvr_data =  zlib.decode(Uint8List.view(buffer, _Header.size));
-  // var pvr_data = ZLibCodec(raw:true).decode(Uint8List.view(buffer, 12));
-  var pvr =  Pvr(pvr_data,buffer.lengthInBytes - _Header.size);
+  var pvr_data =  zlib.decode(Uint8List.view(buffer, _Header.size ));
+  var img = image.PvrtcDecoder().decodePvr(pvr_data);
   return 0;
 }
 

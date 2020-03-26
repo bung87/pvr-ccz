@@ -4,7 +4,6 @@ import './logger.dart';
 
 class Pvr {
   Pvr(Uint8List data, int len) {
-    print(len);
     var header = _PvrHeader.fromBytes(data);
   }
   // Image _img;
@@ -15,8 +14,8 @@ class Pvr {
 
 class _PvrHeader { // 52 bytes
   BigInt hdr_size;
-  BigInt h; // Height
-  BigInt w; // Width
+  BigInt h; // Height pixels
+  BigInt w; // Width pixels
   BigInt mipmap_cnt; // MIP-Map Count
   BigInt format_flags;
   BigInt surface_size; // Num Surfaces
@@ -40,16 +39,16 @@ class _PvrHeader { // 52 bytes
     if (hdr_size != BigInt.from(52)) return false;
 
     if (mipmap_cnt != BigInt.from(0)) return false;
-    if (format() != BigInt.from(0x12)) return false;
+    // if (format() != BigInt.from(0x12)) return false;
     if (flags() != BigInt.from(0x8000)) return false;
 
-    if (surface_size != w * h * BigInt.from(4)) return false;
-    if (pixel_bits != BigInt.from(32)) return false;
+    // if (surface_size != w * h * BigInt.from(4)) return false;
+    // if (pixel_bits != BigInt.from(32)) return false;
 
-    if (r_mask != BigInt.from(0x000000ff)) return false;
-    if (g_mask != BigInt.from(0x0000ff00)) return false;
-    if (b_mask != BigInt.from(0x00ff0000)) return false;
-    if (a_mask != BigInt.from(0xff000000)) return false;
+    // if (r_mask != BigInt.from(0x000000ff)) return false;
+    // if (g_mask != BigInt.from(0x0000ff00)) return false;
+    // if (b_mask != BigInt.from(0x00ff0000)) return false;
+    // if (a_mask != BigInt.from(0xff000000)) return false;
 
     if (magic != BigInt.from(0x21525650)) return false;
     if (surface_cnt != BigInt.from(1)) return false;
@@ -69,14 +68,12 @@ class _PvrHeader { // 52 bytes
     var i = 0;
     var byteData = ByteData.view(buffer);
     reflected.declarations.values.whereType<VariableMirror>().forEach( (e){
-      var value = byteData.getUint32(i,Endian.big);
+      var value = byteData.getUint32(i,Endian.host);
       reflectedInstance.setField(e.simpleName,BigInt.from(value));
       i += SIZE;
     });
-    print(h.valid());
-    print(h.surface_size );
-    print(h.hdr_size);
    
+    print(h.valid());
 
     return h;
   }
