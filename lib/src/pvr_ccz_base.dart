@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:path/path.dart' as p;
 import 'package:image/image.dart';
 
 class UnsupportedCCZHeader implements Exception {
@@ -87,11 +86,7 @@ Image decodeCCB(String filename){
   return PvrtcDecoder().decodePvr(pvr_data);
 }
 
-void main() {
-  inflateCCZFile(Platform.script
-      .resolve(p.join('..', '..', 'test', 'SmlMap0.pvr.ccz'))
-      .toFilePath());
-}
+
 
 // typed_data
 // https://api.dart.dev/stable/2.7.2/dart-typed_data/dart-typed_data-library.html
