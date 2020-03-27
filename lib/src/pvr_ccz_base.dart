@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:image/image.dart';
+import 'dart:async';
 
 class UnsupportedCCZHeader implements Exception {
   final String message = 'Unsupported CCZ header format';
@@ -75,18 +76,70 @@ List<int> inflateCCZBuffer(ByteBuffer buffer) {
   return pvr_data;
 }
 
-List<int> inflateCCZFile(String filename) {
+List<int> inflateCCZFileSync(String filename) {
   var file = File(filename);
   var bytes = file.readAsBytesSync();
   return inflateCCZBuffer(bytes.buffer);
 }
 
-Image decodePvrCcz(String filename){
-  var pvr_data = inflateCCZFile(filename);
+Future<List<int>> inflateCCZFile(String filename) async {
+  var file = File(filename);
+  var bytes = await file.readAsBytes();
+  return inflateCCZBuffer(bytes.buffer);
+}
+
+Image decodePvrCczSync(String filename) {
+  var pvr_data = inflateCCZFileSync(filename);
   return PvrtcDecoder().decodePvr(pvr_data);
 }
 
+Future<Image> decodePvrCcz(String filename) async {
+  var pvr_data = await inflateCCZFile(filename);
+  return PvrtcDecoder().decodePvr(pvr_data);
+}
 
+Future<Uint8List> toPngBytes(dynamic filenameOrByteData) async {
+  var pvr_data;
+  if (filenameOrByteData is String) {
+    pvr_data = pvr_data = await inflateCCZFile(filenameOrByteData);
+  } else {
+    pvr_data = inflateCCZBuffer(filenameOrByteData.buffer);
+  }
+  var img = PvrtcDecoder().decodePvr(pvr_data);
+  return imageAsPngUintList(img);
+}
+
+Uint8List toPngBytesSync(dynamic filenameOrByteData) {
+  var pvr_data;
+  if (filenameOrByteData is String) {
+    pvr_data = inflateCCZFileSync(filenameOrByteData);
+  } else {
+    pvr_data = inflateCCZBuffer(filenameOrByteData.buffer);
+  }
+  var img = PvrtcDecoder().decodePvr(pvr_data);
+  return imageAsPngUintList(img);
+}
+
+/// work with Flame.bundle.load the bundle type is flutter's AssetBundle
+Image decodePvrCczWithByteData(ByteData data) {
+  var pvr_data = inflateCCZBuffer(data.buffer);
+  return PvrtcDecoder().decodePvr(pvr_data);
+}
+
+Uint8List imageAsPngUintList(Image image) {
+  var bb = BytesBuilder();
+  bb.add(encodePng(image));
+  return bb.takeBytes();
+}
+
+// extension Image2PngUint8List on Image{
+//   /// encode as png ,then call dart:ui's decodeImageFromList convert to dart:ui's Image
+//   Uint8List asPngUintList(){
+//     var bb = BytesBuilder();
+//     bb.add(encodePng(this));
+//     return bb.takeBytes();
+//   }
+// }
 
 // typed_data
 // https://api.dart.dev/stable/2.7.2/dart-typed_data/dart-typed_data-library.html
